@@ -4,7 +4,7 @@ const Parrot = () => {
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
       viewBox="0 0 200 165"
-      className="w-full h-full"
+      className="w-full"
     >
       <g>
         <path

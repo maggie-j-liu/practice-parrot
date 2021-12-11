@@ -50,6 +50,7 @@ model User {
   image         String?
   accounts      Account[]
   sessions      Session[]
+  timeTotal     Int       @default(0)
 }
 
 model VerificationToken {

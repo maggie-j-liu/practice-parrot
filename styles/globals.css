@@ -4,6 +4,6 @@
 
 @layer utilities {
   .text-gradient {
-    @apply bg-gradient-to-tr from-primary-500 to-cyan-400 bg-clip-text text-transparent;
+    @apply bg-gradient-to-tr from-secondary-500 to-accent-400 bg-clip-text text-transparent;
   }
 }

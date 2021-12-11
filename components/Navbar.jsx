@@ -4,11 +4,16 @@ import Link from "next/link";
 const Navbar = () => {
   const { data: session } = useSession();
   return (
-    <nav className="h-16 px-8 bg-primary-200 fixed top-0 left-0 right-0">
+    <nav className="h-16 px-8 bg-primary-900 text-primary-50 fixed top-0 left-0 right-0">
       <div className="h-full max-w-5xl mx-auto flex items-center justify-between">
-        <div className="flex items-center gap-8">
+        <div className="flex items-center gap-8 font-light">
           <Link href="/">
-            <a>Practice Parrot</a>
+            <a className="text-secondary-50 underline decoration-accent-300 drop-shadow-md font-bold">
+              Practice Parrot
+            </a>
+          </Link>
+          <Link href="/practice">
+            <a>Practice Room</a>
           </Link>
         </div>
         <div className="flex items-center gap-8">

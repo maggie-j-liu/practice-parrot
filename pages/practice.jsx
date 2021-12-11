@@ -1,11 +1,40 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Parrot from "../components/Parrot";
+import { CircularProgressbar } from "react-circular-progressbar";
+import { BsBarChartFill, BsCheck2 } from "react-icons/bs";
+import { ToastContainer, toast } from "react-toastify";
+
+const convertTime = (seconds) => {
+  seconds = Math.round(seconds);
+  let hours = Math.floor(seconds / 3600);
+  let minutes = Math.floor((seconds - hours * 3600) / 60);
+  let secondsLeft = seconds - hours * 3600 - minutes * 60;
+  return {
+    hours,
+    minutes,
+    seconds: secondsLeft,
+  };
+};
 
 const Practice = () => {
   const [started, setStarted] = useState(false);
   const canvasRef = useRef(null);
   const [background, setBackground] = useState(null);
   const [audio, setAudio] = useState(null);
+  const [mins, setMins] = useState(0);
+  const [startTime, setStartTime] = useState(null);
+
+  useEffect(() => {
+    const beforeTabClose = () => {
+      console.log("left");
+      end();
+    };
+    window.addEventListener("beforeunload", beforeTabClose);
+    return () => {
+      beforeTabClose();
+      window.removeEventListener("beforeunload", beforeTabClose);
+    };
+  }, []);
   // https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API/Visualizations_with_Web_Audio_API
   async function getMedia(constraints) {
     let stream = await navigator.mediaDevices.getUserMedia(constraints);
@@ -18,7 +47,7 @@ const Practice = () => {
     source.connect(analyser);
     const canvas = canvasRef.current;
     const canvasCtx = canvas.getContext("2d");
-    const lastSampled = Date.now();
+    const lastSampled = 0;
     const draw = () => {
       requestAnimationFrame(draw);
       canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
@@ -43,55 +72,171 @@ const Practice = () => {
     draw();
   }
   const start = () => {
+    setStartTime(Date.now());
+    setStarted(true);
     getMedia({ audio: true, video: false });
   };
-  const end = () => {
+  const end = async () => {
     if (audio) {
       audio.getTracks().forEach((track) => track.stop());
-      setAudio(null);
+    }
+    setAudio(null);
+    setBackground(null);
+    setStarted(false);
+    setStartTime(null);
+    if (startTime !== null) {
+      const elapsed = Math.round((Date.now() - startTime) / 1000);
+      toast(`Logged ${displayTime(elapsed)} of practice!`, {
+        position: "bottom-left",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: false,
+        progress: undefined,
+      });
+      await fetch("/api/addtime", {
+        method: "POST",
+        body: JSON.stringify({
+          time: elapsed,
+        }),
+      });
     }
   };
+
   return (
-    <div
-      className="w-full pt-32 pb-16 px-8 duration-300 min-h-screen"
-      style={{
-        backgroundColor:
-          background === null ? "white" : `hsl(${background}, 70%, 90%)`,
-      }}
-    >
-      <h1 className="text-gradient text-4xl font-bold text-center">
-        Practice Room
-      </h1>
-      <p>{started ? "Started" : "Not Started"}</p>
-      <button
-        className="bg-primary-100 px-4 py-1 rounded"
-        onClick={() => {
-          if (started) {
-            end();
-          } else {
-            start();
-          }
-          setStarted(!started);
-        }}
-      >
-        {started ? "End" : "Start"}
-      </button>
+    <>
+      <ToastContainer
+        position="bottom-left"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss={false}
+        draggable={false}
+        pauseOnHover
+      />
       <div
-        className="max-w-2xl mx-auto relative duration-300"
+        className="w-full pt-32 pb-16 px-8 duration-300 min-h-screen text-center"
         style={{
-          color:
-            background === null ? "#cbd5e1" : `hsl(${background}, 70%, 75%)`,
+          backgroundColor: !started ? "white" : `hsl(${background}, 70%, 90%)`,
         }}
       >
-        <Parrot />
-        <canvas
-          className="absolute bottom-0 left-0 right-0 w-full"
-          ref={canvasRef}
-          width="640"
-          height="255"
-        />
+        <h1 className={"text-5xl font-bold text-gradient w-max mx-auto"}>
+          Practice Room
+        </h1>
+        <h2 className="text-xl">
+          A place to practice with your{" "}
+          <i className="underline decoration-accent-300">practice parrot</i>.
+        </h2>
+        <div className="mt-10 flex flex-col md:flex-row justify-center gap-x-8 gap-y-16">
+          <div className="flex flex-col self-center md:self-stretch items-center justify-center bg-white rounded-lg shadow-lg max-w-lg px-12 lg:px-16 py-10">
+            <h2 className="mb-3 text-2xl md:w-72 font-semibold">
+              Start a practice session!
+            </h2>
+            {started ? (
+              <div className="flex items-center justify-around align-baseline gap-2">
+                <span className="text-lg">
+                  Goal: {displayTime(parseFloat(mins) * 60)}{" "}
+                </span>
+                {(Date.now() - startTime) / 700 > parseFloat(mins * 60) ? (
+                  <BsCheck2 className="inline w-6 h-6 text-green-500" />
+                ) : (
+                  <BsBarChartFill className="inline w-6 h-6 text-primary-400" />
+                )}
+              </div>
+            ) : (
+              <label>
+                <p>set a timer for</p>
+                <input
+                  value={mins}
+                  onChange={(e) => setMins(e.target.value)}
+                  type="number"
+                  className="px-2 w-24 mr-2 bg-primary-100 focus:border-accent-400 border-b-2 border-transparent outline-none"
+                />
+                minutes
+              </label>
+            )}
+            <div className="my-8 w-40 mx-auto">
+              <CircularProgressbar
+                value={
+                  startTime === null
+                    ? 0
+                    : ((Date.now() - startTime) /
+                        1000 /
+                        (parseFloat(mins) * 60)) *
+                      100
+                }
+                text={(() => {
+                  let elapsed =
+                    startTime === null ? 0 : (Date.now() - startTime) / 1000;
+                  let display =
+                    startTime === null
+                      ? mins
+                        ? parseFloat(mins) * 60
+                        : 0
+                      : elapsed;
+                  return displayTime(display);
+                })()}
+                styles={{
+                  trail: {
+                    stroke: "#e2e8f0",
+                  },
+                  path: {
+                    stroke: "#06b6d4",
+                  },
+                  text: {
+                    fill: "#06b6d4",
+                    fontSize: "14px",
+                  },
+                }}
+              />
+            </div>
+            <button
+              className="duration-150 hover:bg-primary-200 bg-primary-100 px-4 py-1 rounded disabled:cursor-not-allowed"
+              onClick={() => {
+                if (started) {
+                  end();
+                } else {
+                  start();
+                }
+              }}
+              disabled={!started && mins == 0}
+            >
+              {started ? "End Session" : "Start Session"}
+            </button>
+          </div>
+          <div
+            className="self-center w-full max-w-xl relative duration-300"
+            style={{
+              color: !started ? "#cbd5e1" : `hsl(${background}, 70%, 75%)`,
+            }}
+          >
+            <Parrot />
+            <canvas
+              className="absolute bottom-0 left-0 right-0 w-full"
+              ref={canvasRef}
+              width="640"
+              height="255"
+            />
+          </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 export default Practice;
+
+const displayTime = (seconds) => {
+  let time = convertTime(seconds);
+  let str = "";
+  if (time.hours > 0) {
+    str += time.hours + "h ";
+    str += time.minutes + "m ";
+  } else if (time.minutes > 0) {
+    str += time.minutes + "m ";
+  }
+  str += time.seconds + "s";
+  return str;
+};
