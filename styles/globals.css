@@ -7,3 +7,10 @@
     @apply bg-gradient-to-tr from-secondary-500 to-accent-400 bg-clip-text text-transparent;
   }
 }
+
+@layer base {
+  input[type="number"],
+  input[type="text"] {
+    @apply px-2 bg-primary-100 focus:border-accent-400 border-b-2 border-transparent outline-none;
+  }
+}

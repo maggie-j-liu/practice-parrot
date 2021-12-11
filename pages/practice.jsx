@@ -143,7 +143,7 @@ const Practice = () => {
                     value={mins}
                     onChange={(e) => setMins(e.target.value)}
                     type="number"
-                    className="px-2 w-24 mr-2 bg-primary-100 focus:border-accent-400 border-b-2 border-transparent outline-none"
+                    className="w-24 mr-2"
                   />
                   minutes
                 </label>

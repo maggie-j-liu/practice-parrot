@@ -1,6 +1,7 @@
 import prisma from "../lib/prisma";
 import { getSession } from "next-auth/react";
 import formatTime from "../lib/formatTime";
+import Parrot from "../components/Parrot";
 
 const Leaderboard = ({ leaderboard, user, userRank }) => {
   return (
@@ -30,13 +31,21 @@ const Leaderboard = ({ leaderboard, user, userRank }) => {
               <tr
                 key={person.email}
                 className={
-                  user.email === person.email
+                  person.rank === userRank
                     ? "bg-gradient-to-r from-secondary-100 to-accent-100 font-semibold"
                     : ""
                 }
               >
                 <td className="p-2">{person.rank}</td>
-                <td className="p-2">{person.name}</td>
+                <td className="p-2 flex items-center gap-2">
+                  <div
+                    className="w-6 h-6"
+                    style={{ color: person.parrotColor }}
+                  >
+                    <Parrot />
+                  </div>
+                  {person.name}
+                </td>
                 <td className="p-2">{formatTime(person.timeTotal)}</td>
               </tr>
             ))}
@@ -55,13 +64,20 @@ export const getServerSideProps = async ({ req }) => {
     orderBy: {
       timeTotal: "desc",
     },
+    select: {
+      email: true,
+      name: true,
+      timeTotal: true,
+      parrotColor: true,
+    },
   });
   let userRank = TAKE + 1;
   top = top.map((u, i) => {
     if (u.email === user.email) {
       userRank = i + 1;
     }
-    return { ...u, rank: i + 1 };
+    const { email, ...rest } = u;
+    return { ...rest, rank: i + 1 };
   });
   if (userRank === TAKE + 1) {
     const you = await prisma.user.findUnique({
@@ -69,8 +85,10 @@ export const getServerSideProps = async ({ req }) => {
         email: user.email,
       },
     });
-    top.push({ ...you, rank: top.length + 1 });
+    const { email, ...rest } = you;
+    top.push({ ...rest, rank: top.length + 1 });
   }
+  console.log(top);
   return {
     props: {
       leaderboard: top,

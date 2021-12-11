@@ -51,6 +51,7 @@ model User {
   accounts      Account[]
   sessions      Session[]
   timeTotal     Int       @default(0)
+  parrotColor   String?
 }
 
 model VerificationToken {

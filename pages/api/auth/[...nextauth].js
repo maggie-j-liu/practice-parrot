@@ -17,4 +17,31 @@ export default NextAuth({
     }),
   ],
   secret: process.env.SECRET,
+  callbacks: {
+    async session({ session, user }) {
+      const { parrotColor } = await prisma.user.findUnique({
+        where: {
+          id: user.id,
+        },
+        select: {
+          parrotColor: true,
+        },
+      });
+      if (!parrotColor) {
+        const color = "#" + Math.floor(Math.random() * 16777215).toString(16);
+        await prisma.user.update({
+          where: {
+            id: user.id,
+          },
+          data: {
+            parrotColor: color,
+          },
+        });
+        session.user.parrotColor = color;
+      } else {
+        session.user.parrotColor = parrotColor;
+      }
+      return session;
+    },
+  },
 });

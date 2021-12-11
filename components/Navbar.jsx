@@ -1,5 +1,6 @@
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
+import Parrot from "./Parrot";
 
 const Navbar = () => {
   const { data: session } = useSession();
@@ -21,9 +22,19 @@ const Navbar = () => {
         </div>
         <div className="flex items-center gap-8">
           {session ? (
-            <div>
-              {session.user.name}
-              <span className="mx-2">&bull;</span>
+            <div className="flex items-center gap-2">
+              <Link href="/profile">
+                <a className="flex items-center gap-2">
+                  <div
+                    className="w-6 h-6"
+                    style={{ color: session.user.parrotColor }}
+                  >
+                    <Parrot />
+                  </div>
+                  <span>{session.user.name}</span>
+                </a>
+              </Link>
+              <span>&bull;</span>
               <button onClick={() => signOut()}>Sign Out</button>
             </div>
           ) : (
