@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import Parrot from "../components/Parrot";
 
 const Practice = () => {
   const [started, setStarted] = useState(false);
@@ -17,13 +18,11 @@ const Practice = () => {
     source.connect(analyser);
     const canvas = canvasRef.current;
     const canvasCtx = canvas.getContext("2d");
-    canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
     const lastSampled = Date.now();
     const draw = () => {
-      const drawVisual = requestAnimationFrame(draw);
+      requestAnimationFrame(draw);
+      canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
       analyser.getByteFrequencyData(dataArray);
-      canvasCtx.fillStyle = "hsl(0, 0%, 0%)";
-      canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
       const barWidth = (canvas.width / dataArray.length) * 2.5;
       let barHeight;
       let x = 0;
@@ -54,13 +53,15 @@ const Practice = () => {
   };
   return (
     <div
-      className="pt-32 pb-16 px-8 duration-300 min-h-screen"
+      className="w-full pt-32 pb-16 px-8 duration-300 min-h-screen"
       style={{
         backgroundColor:
-          background === null ? "white" : `hsl(${background}, 70%, 75%)`,
+          background === null ? "white" : `hsl(${background}, 70%, 90%)`,
       }}
     >
-      <h1 className="text-gradient text-4xl font-bold">Practice Room</h1>
+      <h1 className="text-gradient text-4xl font-bold text-center">
+        Practice Room
+      </h1>
       <p>{started ? "Started" : "Not Started"}</p>
       <button
         className="bg-primary-100 px-4 py-1 rounded"
@@ -75,7 +76,21 @@ const Practice = () => {
       >
         {started ? "End" : "Start"}
       </button>
-      <canvas ref={canvasRef} width="640" height="255" />
+      <div
+        className="max-w-2xl mx-auto relative duration-300"
+        style={{
+          color:
+            background === null ? "#cbd5e1" : `hsl(${background}, 70%, 75%)`,
+        }}
+      >
+        <Parrot />
+        <canvas
+          className="absolute bottom-0 left-0 right-0 w-full"
+          ref={canvasRef}
+          width="640"
+          height="255"
+        />
+      </div>
     </div>
   );
 };
