@@ -25,7 +25,7 @@ export default function Home() {
         ) : (
           <>
             Not signed in <br />
-            <button onClick={() => signIn("github")}>Sign in</button>
+            <button onClick={() => signIn("google")}>Sign in</button>
           </>
         )}
       </main>
