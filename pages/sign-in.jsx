@@ -12,7 +12,7 @@ const SignIn = () => {
     <div className="min-h-screen bg-gray-100 px-8 pt-32 pb-16">
       <div className="rounded-xl bg-white max-w-lg px-16 py-8 text-center mx-auto shadow-lg">
         <h1 className="text-4xl font-bold">Sign in to</h1>
-        <h1 className="text-5xl font-bold bg-gradient-to-tr from-primary-500 to-cyan-400 bg-clip-text text-transparent underline decoration-primary-400">
+        <h1 className="text-5xl font-bold text-gradient underline decoration-primary-400">
           Practice Parrot
         </h1>
         <div className="font-semibold flex flex-col items-center mt-8 gap-4">
