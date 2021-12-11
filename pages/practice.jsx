@@ -107,108 +107,110 @@ const Practice = () => {
         pauseOnHover
       />
       <div
-        className="w-full pt-32 pb-16 px-8 duration-300 min-h-screen text-center"
+        className=" w-full pt-32 pb-16 px-8 duration-300 min-h-screen text-center"
         style={{
           backgroundColor: !started ? "white" : `hsl(${background}, 70%, 90%)`,
         }}
       >
-        <h1 className={"text-5xl font-bold text-gradient w-max mx-auto"}>
-          Practice Room
-        </h1>
-        <h2 className="text-xl">
-          A place to practice with your{" "}
-          <i className="underline decoration-accent-300">practice parrot</i>.
-        </h2>
-        <div className="mt-10 flex flex-col md:flex-row justify-center gap-x-8 gap-y-16">
-          <div className="flex flex-col self-center md:self-stretch items-center justify-center bg-white rounded-lg shadow-lg max-w-lg px-12 lg:px-16 py-10">
-            <h2 className="mb-3 text-2xl md:w-72 font-semibold">
-              Start a practice session!
-            </h2>
-            {started ? (
-              <div className="flex items-center justify-around align-baseline gap-2">
-                <span className="text-lg">
-                  Goal: {formatTime(parseFloat(mins) * 60)}{" "}
-                </span>
-                {(Date.now() - startTime) / 700 > parseFloat(mins * 60) ? (
-                  <BsCheck2 className="inline w-6 h-6 text-green-500" />
-                ) : (
-                  <BsBarChartFill className="inline w-6 h-6 text-primary-400" />
-                )}
-              </div>
-            ) : (
-              <label>
-                <p>set a timer for</p>
-                <input
-                  value={mins}
-                  onChange={(e) => setMins(e.target.value)}
-                  type="number"
-                  className="px-2 w-24 mr-2 bg-primary-100 focus:border-accent-400 border-b-2 border-transparent outline-none"
-                />
-                minutes
-              </label>
-            )}
-            <div className="my-8 w-40 mx-auto">
-              <CircularProgressbar
-                value={
-                  startTime === null
-                    ? 0
-                    : ((Date.now() - startTime) /
-                        1000 /
-                        (parseFloat(mins) * 60)) *
-                      100
-                }
-                text={(() => {
-                  let elapsed =
-                    startTime === null ? 0 : (Date.now() - startTime) / 1000;
-                  let display =
+        <div className="max-w-5xl mx-auto">
+          <h1 className={"text-5xl font-bold text-gradient w-max mx-auto"}>
+            Practice Room
+          </h1>
+          <h2 className="text-xl">
+            A place to practice with your{" "}
+            <i className="underline decoration-accent-300">practice parrot</i>.
+          </h2>
+          <div className="mt-10 flex flex-col md:flex-row justify-center gap-x-8 gap-y-16">
+            <div className="flex flex-col self-center md:self-stretch items-center justify-center bg-white rounded-lg shadow-lg max-w-lg px-12 lg:px-16 py-10">
+              <h2 className="mb-3 text-2xl md:w-72 font-semibold">
+                Start a practice session!
+              </h2>
+              {started ? (
+                <div className="flex items-center justify-around align-baseline gap-2">
+                  <span className="text-lg">
+                    Goal: {formatTime(parseFloat(mins) * 60)}{" "}
+                  </span>
+                  {(Date.now() - startTime) / 700 > parseFloat(mins * 60) ? (
+                    <BsCheck2 className="inline w-6 h-6 text-green-500" />
+                  ) : (
+                    <BsBarChartFill className="inline w-6 h-6 text-primary-400" />
+                  )}
+                </div>
+              ) : (
+                <label>
+                  <p>set a timer for</p>
+                  <input
+                    value={mins}
+                    onChange={(e) => setMins(e.target.value)}
+                    type="number"
+                    className="px-2 w-24 mr-2 bg-primary-100 focus:border-accent-400 border-b-2 border-transparent outline-none"
+                  />
+                  minutes
+                </label>
+              )}
+              <div className="my-8 w-40 mx-auto">
+                <CircularProgressbar
+                  value={
                     startTime === null
-                      ? mins
-                        ? parseFloat(mins) * 60
-                        : 0
-                      : elapsed;
-                  return formatTime(display);
-                })()}
-                styles={{
-                  trail: {
-                    stroke: "#e2e8f0",
-                  },
-                  path: {
-                    stroke: "#06b6d4",
-                  },
-                  text: {
-                    fill: "#06b6d4",
-                    fontSize: "14px",
-                  },
+                      ? 0
+                      : ((Date.now() - startTime) /
+                          1000 /
+                          (parseFloat(mins) * 60)) *
+                        100
+                  }
+                  text={(() => {
+                    let elapsed =
+                      startTime === null ? 0 : (Date.now() - startTime) / 1000;
+                    let display =
+                      startTime === null
+                        ? mins
+                          ? parseFloat(mins) * 60
+                          : 0
+                        : elapsed;
+                    return formatTime(display);
+                  })()}
+                  styles={{
+                    trail: {
+                      stroke: "#e2e8f0",
+                    },
+                    path: {
+                      stroke: "#06b6d4",
+                    },
+                    text: {
+                      fill: "#06b6d4",
+                      fontSize: "14px",
+                    },
+                  }}
+                />
+              </div>
+              <button
+                className="duration-150 hover:bg-primary-200 bg-primary-100 px-4 py-1 rounded disabled:cursor-not-allowed"
+                onClick={() => {
+                  if (started) {
+                    end();
+                  } else {
+                    start();
+                  }
                 }}
+                disabled={!started && mins == 0}
+              >
+                {started ? "End Session" : "Start Session"}
+              </button>
+            </div>
+            <div
+              className="self-center w-full max-w-xl relative duration-300"
+              style={{
+                color: !started ? "#cbd5e1" : `hsl(${background}, 70%, 75%)`,
+              }}
+            >
+              <Parrot />
+              <canvas
+                className="absolute bottom-0 left-0 right-0 w-full"
+                ref={canvasRef}
+                width="640"
+                height="255"
               />
             </div>
-            <button
-              className="duration-150 hover:bg-primary-200 bg-primary-100 px-4 py-1 rounded disabled:cursor-not-allowed"
-              onClick={() => {
-                if (started) {
-                  end();
-                } else {
-                  start();
-                }
-              }}
-              disabled={!started && mins == 0}
-            >
-              {started ? "End Session" : "Start Session"}
-            </button>
-          </div>
-          <div
-            className="self-center w-full max-w-xl relative duration-300"
-            style={{
-              color: !started ? "#cbd5e1" : `hsl(${background}, 70%, 75%)`,
-            }}
-          >
-            <Parrot />
-            <canvas
-              className="absolute bottom-0 left-0 right-0 w-full"
-              ref={canvasRef}
-              width="640"
-              height="255"
-            />
           </div>
         </div>
       </div>
