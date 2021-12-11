@@ -3,18 +3,7 @@ import Parrot from "../components/Parrot";
 import { CircularProgressbar } from "react-circular-progressbar";
 import { BsBarChartFill, BsCheck2 } from "react-icons/bs";
 import { ToastContainer, toast } from "react-toastify";
-
-const convertTime = (seconds) => {
-  seconds = Math.round(seconds);
-  let hours = Math.floor(seconds / 3600);
-  let minutes = Math.floor((seconds - hours * 3600) / 60);
-  let secondsLeft = seconds - hours * 3600 - minutes * 60;
-  return {
-    hours,
-    minutes,
-    seconds: secondsLeft,
-  };
-};
+import formatTime from "../lib/formatTime";
 
 const Practice = () => {
   const [started, setStarted] = useState(false);
@@ -86,7 +75,7 @@ const Practice = () => {
     setStartTime(null);
     if (startTime !== null) {
       const elapsed = Math.round((Date.now() - startTime) / 1000);
-      toast(`Logged ${displayTime(elapsed)} of practice!`, {
+      toast(`Logged ${formatTime(elapsed)} of practice!`, {
         position: "bottom-left",
         autoClose: 5000,
         hideProgressBar: false,
@@ -138,7 +127,7 @@ const Practice = () => {
             {started ? (
               <div className="flex items-center justify-around align-baseline gap-2">
                 <span className="text-lg">
-                  Goal: {displayTime(parseFloat(mins) * 60)}{" "}
+                  Goal: {formatTime(parseFloat(mins) * 60)}{" "}
                 </span>
                 {(Date.now() - startTime) / 700 > parseFloat(mins * 60) ? (
                   <BsCheck2 className="inline w-6 h-6 text-green-500" />
@@ -177,7 +166,7 @@ const Practice = () => {
                         ? parseFloat(mins) * 60
                         : 0
                       : elapsed;
-                  return displayTime(display);
+                  return formatTime(display);
                 })()}
                 styles={{
                   trail: {
@@ -227,16 +216,3 @@ const Practice = () => {
   );
 };
 export default Practice;
-
-const displayTime = (seconds) => {
-  let time = convertTime(seconds);
-  let str = "";
-  if (time.hours > 0) {
-    str += time.hours + "h ";
-    str += time.minutes + "m ";
-  } else if (time.minutes > 0) {
-    str += time.minutes + "m ";
-  }
-  str += time.seconds + "s";
-  return str;
-};

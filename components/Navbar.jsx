@@ -15,6 +15,9 @@ const Navbar = () => {
           <Link href="/practice">
             <a>Practice Room</a>
           </Link>
+          <Link href="/leaderboard">
+            <a>Leaderboard</a>
+          </Link>
         </div>
         <div className="flex items-center gap-8">
           {session ? (
