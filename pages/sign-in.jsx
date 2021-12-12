@@ -1,5 +1,7 @@
 import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/router";
+import { FcGoogle } from "react-icons/fc";
+import { SiGithub } from "react-icons/si";
 
 const SignIn = () => {
   const { status } = useSession();
@@ -11,22 +13,23 @@ const SignIn = () => {
   return (
     <div className="min-h-screen bg-gray-100 px-8 pt-32 pb-16">
       <div className="rounded-xl bg-white max-w-lg px-16 py-8 text-center mx-auto shadow-lg">
-        <h1 className="text-4xl font-bold">Sign in to</h1>
-        <h1 className="text-5xl font-bold text-gradient underline decoration-accent-400">
+        <h1 className="text-3xl sm:text-4xl font-bold">Sign in to</h1>
+        <h1 className="text-3xl sm:text-5xl font-bold text-gradient underline decoration-accent-400">
           Practice Parrot
         </h1>
         <div className="font-semibold flex flex-col items-center mt-8 gap-4">
           <button
             onClick={() => signIn("google")}
-            className="font-medium w-max py-2 px-6 bg-gray-100 border-red-400 border-2 rounded-lg"
+            className="flex items-center gap-2 font-medium w-max py-2 px-6 bg-primary-100 hover:bg-primary-200 duration-150 border-secondary-400 border-2 rounded-lg"
           >
-            Sign in with Google
+            <FcGoogle className="w-6 h-6" /> <span>Sign in with Google</span>
           </button>
           <button
             onClick={() => signIn("github")}
-            className="font-medium w-max py-2 px-6 bg-gray-800 text-gray-50 border-gray-800 border-2 rounded-lg"
+            className="flex items-center gap-2 font-medium w-max py-2 px-6 bg-primary-800 hover:bg-primary-900 duration-150 text-gray-50 border-accent-400 border-2 rounded-lg"
           >
-            Sign in with GitHub
+            <SiGithub className="w-6 h-6" />
+            <span>Sign in with GitHub</span>
           </button>
         </div>
       </div>
