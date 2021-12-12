@@ -8,7 +8,7 @@ export default function Home() {
     <div>
       <main
         className={
-          "flex flex-col items-center justify-center w-screen h-screen px-8 pt-16"
+          "flex flex-col items-center justify-center w-screen h-screen px-8 pt-16 gap-4"
         }
       >
         <h1 className={"text-4xl sm:text-5xl font-bold text-gradient"}>
