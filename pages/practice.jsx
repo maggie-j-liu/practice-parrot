@@ -1,17 +1,19 @@
-import { useEffect, useRef, useState } from "react";
+import { createRef, useEffect, useRef, useState } from "react";
 import Parrot from "../components/Parrot";
 import { CircularProgressbar } from "react-circular-progressbar";
 import { BsBarChartFill, BsCheck2 } from "react-icons/bs";
 import { ToastContainer, toast } from "react-toastify";
 import formatTime from "../lib/formatTime";
+import { useSession } from "next-auth/react";
 
 const Practice = () => {
+  const { data: session } = useSession();
   const [started, setStarted] = useState(false);
   const canvasRef = useRef(null);
   const [background, setBackground] = useState(null);
   const [audio, setAudio] = useState(null);
   const [mins, setMins] = useState(0);
-  const [startTime, setStartTime] = useState(null);
+  const startTime = useRef(null);
 
   useEffect(() => {
     const beforeTabClose = () => {
@@ -20,14 +22,31 @@ const Practice = () => {
     };
     window.addEventListener("beforeunload", beforeTabClose);
     return () => {
+      console.log("inside", startTime.current);
       beforeTabClose();
       window.removeEventListener("beforeunload", beforeTabClose);
     };
   }, []);
   // https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API/Visualizations_with_Web_Audio_API
   async function getMedia(constraints) {
-    let stream = await navigator.mediaDevices.getUserMedia(constraints);
-    setAudio(stream);
+    let stream;
+    try {
+      stream = await navigator.mediaDevices.getUserMedia(constraints);
+      setAudio(stream);
+    } catch (error) {
+      console.log(error);
+      toast.error("Please allow microphone access on this page.", {
+        position: "bottom-left",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+      return false;
+    }
+
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     const analyser = audioCtx.createAnalyser();
     analyser.fftSize = 256;
@@ -60,11 +79,26 @@ const Practice = () => {
     };
     draw();
   }
-  const start = () => {
-    setStartTime(Date.now());
-    setStarted(true);
-    getMedia({ audio: true, video: false });
+  const start = async () => {
+    if (!session?.user) {
+      toast.error("You must sign in to start a session.", {
+        position: "bottom-left",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+      return;
+    }
+
+    if (await getMedia({ audio: true, video: false })) {
+      startTime.current = Date.now();
+      setStarted(true);
+    }
   };
+
   const end = async () => {
     if (audio) {
       audio.getTracks().forEach((track) => track.stop());
@@ -72,9 +106,10 @@ const Practice = () => {
     setAudio(null);
     setBackground(null);
     setStarted(false);
-    setStartTime(null);
-    if (startTime !== null) {
-      const elapsed = Math.round((Date.now() - startTime) / 1000);
+    console.log(startTime.current);
+    if (startTime.current !== null) {
+      console.log("end");
+      const elapsed = Math.round((Date.now() - startTime.current) / 1000);
       toast(`Logged ${formatTime(elapsed)} of practice!`, {
         position: "bottom-left",
         autoClose: 5000,
@@ -91,6 +126,7 @@ const Practice = () => {
         }),
       });
     }
+    startTime.current = null;
   };
 
   return (
@@ -130,7 +166,8 @@ const Practice = () => {
                   <span className="text-lg">
                     Goal: {formatTime(parseFloat(mins) * 60)}{" "}
                   </span>
-                  {(Date.now() - startTime) / 700 > parseFloat(mins * 60) ? (
+                  {(Date.now() - startTime.current) / 700 >
+                  parseFloat(mins * 60) ? (
                     <BsCheck2 className="inline w-6 h-6 text-green-500" />
                   ) : (
                     <BsBarChartFill className="inline w-6 h-6 text-primary-400" />
@@ -151,18 +188,20 @@ const Practice = () => {
               <div className="my-8 w-40 mx-auto">
                 <CircularProgressbar
                   value={
-                    startTime === null
+                    startTime.current === null
                       ? 0
-                      : ((Date.now() - startTime) /
+                      : ((Date.now() - startTime.current) /
                           1000 /
                           (parseFloat(mins) * 60)) *
                         100
                   }
                   text={(() => {
                     let elapsed =
-                      startTime === null ? 0 : (Date.now() - startTime) / 1000;
+                      startTime.current === null
+                        ? 0
+                        : (Date.now() - startTime.current) / 1000;
                     let display =
-                      startTime === null
+                      startTime.current === null
                         ? mins
                           ? parseFloat(mins) * 60
                           : 0

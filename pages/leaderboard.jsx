@@ -3,21 +3,23 @@ import { getSession } from "next-auth/react";
 import formatTime from "../lib/formatTime";
 import Parrot from "../components/Parrot";
 
-const Leaderboard = ({ leaderboard, user, userRank }) => {
+const Leaderboard = ({ leaderboard, userRank }) => {
   return (
     <main className="pt-32 pb-16 px-8">
       <div className="max-w-5xl mx-auto">
         <h1 className="mx-auto w-max text-5xl text-gradient font-bold">
-          Leaderboard
+          Top 40 Leaderboard
         </h1>
-        <h2 className="text-lg text-center">
+        <h2 className="mb-6 text-lg text-center">
           Keep <i className="underline decoration-accent-300">practicing</i>!
           Practice 40 hours every day and you'll be on top of the leaderboard!
         </h2>
-        <p className="mt-6">
-          Your current rank:{" "}
-          <span className="text-secondary-800 font-bold">{userRank}</span>
-        </p>
+        {userRank && (
+          <p>
+            Your current rank:{" "}
+            <span className="text-secondary-800 font-bold">{userRank}</span>
+          </p>
+        )}
         <table className="w-full mt-2">
           <thead className="text-left border-b-2">
             <tr>
@@ -57,8 +59,15 @@ const Leaderboard = ({ leaderboard, user, userRank }) => {
 };
 export default Leaderboard;
 export const getServerSideProps = async ({ req }) => {
-  const { user } = await getSession({ req });
-  const TAKE = 30;
+  const data = await getSession({ req });
+  let user;
+  if (!data) {
+    user = null;
+  } else {
+    user = data.user;
+  }
+
+  const TAKE = 40;
   let top = await prisma.user.findMany({
     take: TAKE,
     orderBy: {
@@ -73,13 +82,13 @@ export const getServerSideProps = async ({ req }) => {
   });
   let userRank = TAKE + 1;
   top = top.map((u, i) => {
-    if (u.email === user.email) {
+    if (user && u.email === user.email) {
       userRank = i + 1;
     }
     const { email, ...rest } = u;
     return { ...rest, rank: i + 1 };
   });
-  if (userRank === TAKE + 1) {
+  if (userRank === TAKE + 1 && user) {
     const you = await prisma.user.findUnique({
       where: {
         email: user.email,
@@ -92,8 +101,7 @@ export const getServerSideProps = async ({ req }) => {
   return {
     props: {
       leaderboard: top,
-      user,
-      userRank,
+      userRank: user ? userRank : null,
     },
   };
 };

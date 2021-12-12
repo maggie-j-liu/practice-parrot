@@ -4,17 +4,21 @@ import Parrot from "../components/Parrot";
 import { useRouter } from "next/router";
 
 const Profile = () => {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const [name, setName] = useState("");
   const [color, setColor] = useState("#ffffff");
+  const [saving, setSaving] = useState(false);
   const router = useRouter();
   useEffect(() => {
     if (session?.user) {
       setName(session.user.name);
       setColor(session.user.parrotColor);
+    } else if (status === "unauthenticated") {
+      router.replace("/sign-in");
     }
-  }, [session]);
+  }, [session, status]);
   const save = async () => {
+    setSaving(true);
     if (name === session.user.name && color === session.user.parrotColor) {
       return;
     }
@@ -25,6 +29,7 @@ const Profile = () => {
         color,
       }),
     });
+    setSaving(false);
     router.reload();
   };
   if (!session?.user) return null;
@@ -62,9 +67,9 @@ const Profile = () => {
       <button
         onClick={() => save()}
         className="disabled:cursor-not-allowed disabled:bg-primary-200 disabled:hover:bg-primary-200 bg-secondary-200 hover:bg-secondary-300 duration-150 px-3 py-0.5 text-lg rounded-md"
-        disabled={!name || !color}
+        disabled={!name || !color || saving}
       >
-        Save
+        {saving ? "Saving" : "Save"}
       </button>
     </div>
   );
