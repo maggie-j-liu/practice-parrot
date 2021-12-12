@@ -1,6 +1,8 @@
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import Parrot from "./Parrot";
+import Image from "next/image";
+import favicon from "../public/favicon.png";
 
 const Navbar = () => {
   const { data: session } = useSession();
@@ -9,8 +11,11 @@ const Navbar = () => {
       <div className="h-full max-w-5xl mx-auto flex items-center justify-between text-sm sm:text-base">
         <div className="flex items-center gap-4 sm:gap-8 font-light">
           <Link href="/">
-            <a className="text-secondary-50 underline decoration-accent-300 drop-shadow-md font-bold">
-              <span>Practice Parrot</span>
+            <a className="flex items-center gap-2 text-secondary-50 underline decoration-accent-300 drop-shadow-md font-bold">
+              <div className="w-6 h-6 mb-1">
+                <Image src={favicon} />{" "}
+              </div>
+              <span className="hidden sm:block">Practice Parrot</span>
             </a>
           </Link>
           <Link href="/practice">

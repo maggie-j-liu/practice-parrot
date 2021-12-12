@@ -6,10 +6,6 @@ export default function Home() {
   const { data: session } = useSession();
   return (
     <div>
-      <Head>
-        <title>Practice Parrot</title>
-        <meta name="description" content="Practice Parrot" />
-      </Head>
       <main
         className={
           "flex flex-col items-center justify-center w-screen h-screen px-8 pt-16"
@@ -20,7 +16,7 @@ export default function Home() {
         </h1>
         <h2 className="max-w-3xl text-center text-lg sm:text-xl">
           For classical musicians, practicing is important, but can be boring.
-          Practice Parrot helps make practicing more rewarding, with a practice
+          Practice Parrot makes practicing more rewarding, with a practice
           parrot buddy, rainbow colors and a competitive leaderboard!
         </h2>
         <div className="mt-4">
