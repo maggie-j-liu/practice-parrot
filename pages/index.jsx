@@ -12,14 +12,21 @@ export default function Home() {
       </Head>
       <main
         className={
-          "flex flex-col items-center justify-center w-screen h-screen"
+          "flex flex-col items-center justify-center w-screen h-screen px-8 pt-16"
         }
       >
-        <h1 className={"text-4xl font-bold text-gradient"}>Practice Parrot</h1>
+        <h1 className={"text-4xl sm:text-5xl font-bold text-gradient"}>
+          Practice Parrot
+        </h1>
+        <h2 className="max-w-3xl text-center text-lg sm:text-xl">
+          For classical musicians, practicing is important, but can be boring.
+          Practice Parrot helps make practicing more rewarding, with a practice
+          parrot buddy, rainbow colors and a competitive leaderboard!
+        </h2>
         <div className="mt-4">
           <Link href={session ? "/practice" : "/sign-in"}>
             <a className="bg-gray-800 text-gray-50 text-2xl px-4 py-2 rounded shadow-lg shadow-primary-100 hover:shadow-secondary-300 duration-500">
-              Get Started
+              {session ? "Get Started" : "Sign In"}
             </a>
           </Link>
         </div>
