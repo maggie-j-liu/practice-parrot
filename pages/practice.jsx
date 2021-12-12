@@ -107,6 +107,7 @@ const Practice = () => {
     setStarted(false);
     if (startTime.current !== null) {
       const elapsed = Math.round((Date.now() - startTime.current) / 1000);
+      startTime.current = null;
       toast(`Logged ${formatTime(elapsed)} of practice!`, {
         position: "bottom-left",
         autoClose: 5000,
@@ -123,7 +124,6 @@ const Practice = () => {
         }),
       });
     }
-    startTime.current = null;
   };
 
   return (
