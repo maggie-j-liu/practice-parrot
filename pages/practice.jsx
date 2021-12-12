@@ -17,12 +17,10 @@ const Practice = () => {
 
   useEffect(() => {
     const beforeTabClose = () => {
-      console.log("left");
       end();
     };
     window.addEventListener("beforeunload", beforeTabClose);
     return () => {
-      console.log("inside", startTime.current);
       beforeTabClose();
       window.removeEventListener("beforeunload", beforeTabClose);
     };
@@ -34,7 +32,7 @@ const Practice = () => {
       stream = await navigator.mediaDevices.getUserMedia(constraints);
       setAudio(stream);
     } catch (error) {
-      console.log(error);
+      console.error(error);
       toast.error("Please allow microphone access on this page.", {
         position: "bottom-left",
         autoClose: 5000,
@@ -78,6 +76,7 @@ const Practice = () => {
       }
     };
     draw();
+    return true;
   }
   const start = async () => {
     if (!session?.user) {
@@ -106,9 +105,7 @@ const Practice = () => {
     setAudio(null);
     setBackground(null);
     setStarted(false);
-    console.log(startTime.current);
     if (startTime.current !== null) {
-      console.log("end");
       const elapsed = Math.round((Date.now() - startTime.current) / 1000);
       toast(`Logged ${formatTime(elapsed)} of practice!`, {
         position: "bottom-left",

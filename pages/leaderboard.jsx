@@ -97,7 +97,6 @@ export const getServerSideProps = async ({ req }) => {
     const { email, ...rest } = you;
     top.push({ ...rest, rank: top.length + 1 });
   }
-  console.log(top);
   return {
     props: {
       leaderboard: top,
