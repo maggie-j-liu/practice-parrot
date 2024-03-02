@@ -1,10 +1,12 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
+
+// TODO: REVERT THESE CHANGES IN MY PR
 datasource db {
-  provider             = "mysql"
+  provider             = "postgresql"
   url                  = env("DATABASE_URL")
-  shadowDatabaseUrl    = env("SHADOW_DATABASE_URL")
+  // shadowDatabaseUrl    = env("SHADOW_DATABASE_URL")
   referentialIntegrity = "prisma"
 }
 
